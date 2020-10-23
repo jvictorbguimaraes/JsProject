@@ -1,0 +1,172 @@
+<html>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+    integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+<body>
+    <div class="d-md-inline-flex w-100 justify-content-between">
+        <h2 class="m-3">List of Students</h2>
+        <button id="myBtn" class="btn btn-primary m-3 float-right">Add new Student</button>
+    </div>
+    <table id="studentTable" class="table">
+        <thead class="thead-dark">
+            <tr>
+                <th scope="col">First Name</th>
+                <th scope="col">Last Name</th>
+                <th scope="col">Address</th>
+                <th scope="col">E-mail</th>
+                <th scope="col">Program</th>
+                <th scope="col">Current GPA</th>
+                <th scope="col"></th>
+            </tr>
+        </thead>
+    </table>
+    <div id="myModal" class="modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add new Student</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="my-form" action="" method="dialog">
+                        <label for="studentName">First Name:</label><br>
+                        <input class="w-100" type="text" name="studentName" required><br><br>
+                        <label for="studentLastName">Last Name:</label><br>
+                        <input class="w-100" type="text" name="studentLastName" required><br><br>
+                        <label for="studentAddress">Address:</label><br>
+                        <input class="w-100" type="text" name="studentAddress" required><br><br>
+                        <label for="studentEmail">E-mail:</label><br>
+                        <input class="w-100" type="text" name="studentEmail" required><br><br>
+                        <label for="studentProgram">Program:</label><br>
+                        <input class="w-100" type="text" name="studentProgram" required><br><br>
+                        <label for="studentGPA">Current GPA:</label><br>
+                        <input class="w-100" type="number" name="studentGPA"><br><br>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button id="submitStudent" type="submit" form="my-form" class="btn btn-primary">Save
+                        changes</button>
+                    <!-- <button type="button" class="btn btn-secondary" class="" data-dismiss="modal">Close</button> -->
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+<script>
+    $(document).ready(function () {
+        $.get(window.location.href + "posts", function (data, status) {
+            $.each(data, function (key, value) {
+                addToTable(value);
+            });
+        });
+    });
+
+    var modal = document.getElementById("myModal");
+    var btn = document.getElementById("myBtn");
+    var span = document.getElementsByClassName("close")[0];
+    btn.onclick = function () {
+        modal.style.display = "block";
+    }
+    span.onclick = function () {
+        modal.style.display = "none";
+    }
+    window.onclick = function (event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    }
+
+    $('#my-form').submit(function () {
+        $.ajax({
+            url: 'posts',
+            type: 'POST',
+            data: $('#my-form').serialize(),
+            success: function (data) {
+                addToTable(data);
+            }
+        })
+    });
+
+    $("#submitStudent").click(function () {
+        var student = {}
+        modal.style.display = "none";
+    });
+
+    function addToTable(item) {
+        $('#studentTable').append(`<tr>
+                    <td scope='row'>${item.studentName}</td>
+                    <td scope='row'>${item.studentLastName}</td>
+                    <td scope='row'>${item.studentAddress}</td>
+                    <td scope='row'>${item.studentEmail}</td>
+                    <td scope='row'>${item.studentProgram}</td>
+                    <td scope='row'>${item.studentGPA}</td>
+                    <td scope='row'><button class="btn btn-danger" onClick="removeStudent('${item._id}', this)">Remove</button></td>
+                </tr>`);
+    }
+
+    function removeStudent(id, button) {
+        $.ajax({
+            url: '/posts/' + id,
+            type: 'DELETE',
+            success: function (result) {
+                $(button).closest('tr').remove();
+            }
+        });
+    }
+
+</script>
+
+</html>
+
+<style>
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgb(0, 0, 0);
+        background-color: rgba(0, 0, 0, 0.4);
+    }
+
+    .modal-content {
+        background-color: #fefefe;
+        margin: 15% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+    }
+
+    .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+    }
+
+    .close:hover,
+    .close:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
+    }
+    table,
+    thead,
+    tr,
+    tbody,
+    th,
+    td {
+        text-align: center;
+    }
+
+    .table td {
+        text-align: center;
+    }
+</style>
